@@ -1,0 +1,14 @@
+[
+  {
+    "id": "bustravel-iceland",
+    "name": "Marie",
+    "company": "BusTravel Iceland",
+    "file": "bustravel-iceland.csv"
+  },
+  {
+    "id": "rome-tours",
+    "name": "Luca",
+    "company": "Rome Tours Co.",
+    "file": "rome-tours.csv"
+  }
+]

@@ -28,15 +28,17 @@
     <div style="display:flex;align-items:center;gap:24px;">
       <img src="assets/logo-gyg.svg" alt="GetYourGuide" class="topnav__logo">
     </div>
-    <div class="topnav__user">
+    <div class="topnav__user" id="supplier-switcher" role="button" tabindex="0"
+         aria-haspopup="listbox" aria-expanded="false" aria-label="Switch supplier">
       <div class="topnav__avatar"></div>
       <div class="topnav__user-info">
-        <span class="topnav__name">Marie</span>
-        <span class="topnav__company">BusTravel Iceland</span>
+        <span class="topnav__name" id="supplier-name">Marie</span>
+        <span class="topnav__company" id="supplier-company">BusTravel Iceland</span>
       </div>
       <svg class="topnav__chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M4 6l4 4 4-4" stroke="#858995" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
+      <ul class="supplier-menu" id="supplier-menu" role="listbox" aria-label="Suppliers" hidden></ul>
     </div>
   </header>
 
@@ -233,6 +235,7 @@
   <script src="js/interactions.js"></script>
   <script src="js/defects-data.js"></script>
   <script src="js/defects-render.js"></script>
+  <script src="js/suppliers.js"></script>
   <script src="js/chart-data.js"></script>
   <script src="js/chart-render.js"></script>
   <script src="js/chart-tooltip.js"></script>
