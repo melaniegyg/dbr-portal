@@ -1,8 +1,10 @@
 // ============================================================
 // Disrupted-booking-rate chart hover tooltip
-// Snaps to the nearest daily data point, shows a dot + guide
-// line on the chart and a popover with the date, that day's
-// rate, and the recommended max (5%).
+// Snaps to the nearest plotted point (published by js/chart-render.js
+// on window.DBR_CHART_STATE), shows a dot + guide line on the chart
+// and a popover with the date, that point's rate, and the
+// recommended max (5%). Re-hides itself whenever the chart
+// re-renders for a new date range.
 // ============================================================
 (function () {
   "use strict";
@@ -13,31 +15,7 @@
   if (!svg) return;
 
   const RECOMMENDED_MAX = 5.0;
-
-  // Sample daily rates (%) matching the drawn curve, Jun 20 → Jul 18 2026.
-  const VALUES = [
-    0.2, 1.5, 5.5, 8.3, 8.0, 5.5, 2.5, 2.0, 5.0, 8.5, 8.0, 5.0, 3.0, 2.2, 2.0,
-    2.1, 2.4, 2.9, 3.5, 4.2, 4.7, 5.0, 5.5, 6.0, 6.4, 6.7, 6.9, 7.0, 7.1,
-  ];
-
-  // Chart coordinate system (matches the SVG in index.html)
-  const X0 = 60, X1 = 1130, BASE_Y = 180, PX_PER_PCT = 16;
-  const VB_W = 1150, VB_H = 230;
-  const n = VALUES.length;
-  const step = (X1 - X0) / (n - 1);
-
-  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const start = new Date(2026, 5, 20); // Jun 20 2026
-  const points = VALUES.map((v, i) => {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    return {
-      x: X0 + i * step,
-      y: BASE_Y - v * PX_PER_PCT,
-      v: v,
-      date: MONTHS[d.getMonth()] + " " + d.getDate() + ", " + d.getFullYear(),
-    };
-  });
+  const VB_W = 1150, VB_H = 230, BASE_Y = 180;
 
   const fmtPct = (v) => (v % 1 === 0 ? v.toFixed(0) : v.toFixed(1)) + "%";
 
@@ -74,8 +52,7 @@
     return { r: r, sx: r.width / VB_W, sy: r.height / VB_H };
   }
 
-  function show(i) {
-    const p = points[i];
+  function show(p) {
     const m = metrics();
 
     guide.setAttribute("x1", String(p.x));
@@ -86,7 +63,7 @@
     dot.style.display = "";
 
     tt.innerHTML =
-      '<div class="chart-tt__date">' + p.date + "</div>" +
+      '<div class="chart-tt__date">' + p.label + "</div>" +
       '<div class="chart-tt__value">' + fmtPct(p.v) + "</div>" +
       '<div class="chart-tt__label">Recommended max</div>' +
       '<div class="chart-tt__max">' + RECOMMENDED_MAX.toFixed(1) + "%</div>";
@@ -113,15 +90,29 @@
   }
 
   svg.addEventListener("mousemove", function (e) {
-    const m = metrics();
-    const mx = (e.clientX - m.r.left) / m.sx; // → SVG x
-    if (mx < X0 - step || mx > X1 + step) {
+    const state = window.DBR_CHART_STATE;
+    if (!state || !state.points || !state.points.length) {
       hide();
       return;
     }
-    let i = Math.round((mx - X0) / step);
-    i = Math.max(0, Math.min(n - 1, i));
-    show(i);
+    const m = metrics();
+    const mx = (e.clientX - m.r.left) / m.sx; // → SVG x
+    const step = state.points.length > 1 ? (state.X1 - state.X0) / (state.points.length - 1) : 0;
+    if (mx < state.X0 - step || mx > state.X1 + step) {
+      hide();
+      return;
+    }
+    let nearest = 0;
+    let best = Infinity;
+    for (let i = 0; i < state.points.length; i++) {
+      const dist = Math.abs(state.points[i].x - mx);
+      if (dist < best) {
+        best = dist;
+        nearest = i;
+      }
+    }
+    show(state.points[nearest]);
   });
   svg.addEventListener("mouseleave", hide);
+  svg.addEventListener("dbr-chart:rendered", hide);
 })();
