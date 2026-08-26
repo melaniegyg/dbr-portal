@@ -6,8 +6,22 @@
   <title>Performance Hub — Disrupted Bookings · DBR Concept</title>
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/styles.css">
+  <!-- Skip the password gate if already unlocked this session (avoids flash) -->
+  <script>try{if(sessionStorage.getItem('dbr-auth')==='1')document.documentElement.className+=' authed';}catch(e){}</script>
 </head>
 <body>
+
+  <!-- ===================== PASSWORD GATE (cosmetic — see js/auth-gate.js) ===================== -->
+  <div id="auth-gate" class="auth-gate">
+    <form class="auth-gate__card" id="auth-form">
+      <img src="assets/logo-gyg.svg" alt="GetYourGuide" class="auth-gate__logo">
+      <h1 class="auth-gate__title">Protected preview</h1>
+      <p class="auth-gate__desc">Enter the password to view this prototype.</p>
+      <input type="password" id="auth-input" class="auth-gate__input" placeholder="Password" autocomplete="current-password" aria-label="Password">
+      <button type="submit" class="auth-gate__btn">Enter</button>
+      <p class="auth-gate__error hidden" id="auth-error">Incorrect password. Try again.</p>
+    </form>
+  </div>
 
   <!-- ===================== TOP NAV ===================== -->
   <header class="topnav">
@@ -225,5 +239,6 @@
   <script src="js/defects-render.js"></script>
   <script src="js/chart-tooltip.js"></script>
   <script src="js/date-range.js"></script>
+  <script src="js/auth-gate.js"></script>
 </body>
 </html>
