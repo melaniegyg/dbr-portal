@@ -681,22 +681,9 @@ text.chart-axis {
 }
 .defect-nav-item:hover { background: var(--gyg-background-secondary); }
 .defect-nav-item.is-active { background: #e1f0ff; }
-.defect-nav-item__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .defect-nav-item__title { font: var(--font-body-strong); color: var(--gyg-label-primary); }
 .defect-nav-item.is-active .defect-nav-item__title { color: var(--gyg-interactive-primary); }
 .defect-nav-item__desc { font: var(--font-caption); color: var(--gyg-label-secondary); }
-.defect-nav-item__count {
-  flex-shrink: 0;
-  font: var(--font-caption-strong);
-  color: var(--gyg-label-secondary);
-  background: var(--gyg-background-secondary);
-  border-radius: var(--radius-pill);
-  padding: 1px 9px;
-}
-.defect-nav-item.is-active .defect-nav-item__count {
-  background: var(--gyg-interactive-primary);
-  color: white;
-}
 
 /* RIGHT column */
 .cc-right { position: relative; min-width: 0; }

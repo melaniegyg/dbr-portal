@@ -244,14 +244,8 @@
     cat.defects.forEach((defect, di) => {
       const item = el("button", "defect-nav-item" + (di === 0 ? " is-active" : ""));
       item.type = "button";
-      const badge = (defect.count != null)
-        ? '<span class="defect-nav-item__count">' + escapeHtml(defect.count) + "</span>"
-        : "";
       item.innerHTML =
-        '<span class="defect-nav-item__row">' +
-          '<span class="defect-nav-item__title">' + escapeHtml(defect.name) + "</span>" +
-          badge +
-        "</span>" +
+        '<span class="defect-nav-item__title">' + escapeHtml(defect.name) + "</span>" +
         '<span class="defect-nav-item__desc">' + escapeHtml(defect.description) + "</span>";
       item.addEventListener("click", () => {
         nav.querySelectorAll(".defect-nav-item").forEach((n) => n.classList.remove("is-active"));
