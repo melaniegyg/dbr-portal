@@ -63,6 +63,7 @@
       rangeEl.textContent = rangeText(o.days);
       menu.querySelectorAll(".select-menu__item").forEach((x) => x.classList.remove("is-active"));
       li.classList.add("is-active");
+      if (window.DBR_CHART) window.DBR_CHART.render(o.days);
       close();
     });
     menu.appendChild(li);

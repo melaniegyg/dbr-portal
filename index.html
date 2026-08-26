@@ -191,20 +191,14 @@
               <text x="50" y="120" text-anchor="end" class="chart-axis">4%</text>
               <text x="50" y="152" text-anchor="end" class="chart-axis">2%</text>
               <text x="50" y="184" text-anchor="end" class="chart-axis">0%</text>
-              <!-- Amber fill: only where the rate exceeds the 5% recommended max -->
-              <path d="M 60,180 C 110,180 150,50 185,44 C 220,40 262,150 300,150 C 336,150 352,42 376,40 C 420,38 490,132 570,154 C 680,170 780,138 862,100 C 962,66 1055,70 1130,66 L 1130,180 L 60,180 Z"
-                    fill="#fcebc6" clip-path="url(#dbr-above-max)"/>
+              <!-- Amber fill: only where the rate exceeds the 5% recommended max (path drawn by js/chart-render.js) -->
+              <path id="dbr-area-path" fill="#fcebc6" clip-path="url(#dbr-above-max)"/>
               <!-- Recommended max line (5%) -->
               <line x1="60" y1="100" x2="1130" y2="100" stroke="#1a2b49" stroke-width="1.5" stroke-dasharray="6 5"/>
-              <!-- Disrupted booking rate line -->
-              <path d="M 60,180 C 110,180 150,50 185,44 C 220,40 262,150 300,150 C 336,150 352,42 376,40 C 420,38 490,132 570,154 C 680,170 780,138 862,100 C 962,66 1055,70 1130,66"
-                    fill="none" stroke="#1a2b49" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <!-- X-axis labels -->
-              <text x="60"    y="205" text-anchor="start"  class="chart-axis">Jun 20</text>
-              <text x="327"   y="205" text-anchor="middle" class="chart-axis">Jun 27</text>
-              <text x="595"   y="205" text-anchor="middle" class="chart-axis">Jul 4</text>
-              <text x="862"   y="205" text-anchor="middle" class="chart-axis">Jul 11</text>
-              <text x="1130"  y="205" text-anchor="end"    class="chart-axis">Jul 18</text>
+              <!-- Disrupted booking rate line (path drawn by js/chart-render.js) -->
+              <path id="dbr-line-path" fill="none" stroke="#1a2b49" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <!-- X-axis labels: rebuilt by js/chart-render.js for the selected date range -->
+              <g id="dbr-x-axis"></g>
             </svg>
           </div>
         </div>
@@ -214,7 +208,7 @@
       <!-- ===================== KEY DRIVERS SECTION ===================== -->
       <section class="key-drivers-section">
         <div>
-          <h2 class="section-heading">Key drivers</h2>
+          <h2 class="section-heading">Key drivers for the past 90 days</h2>
           <p class="section-desc" style="margin-top:8px;">These are the key drivers contributing to your disrupted bookings.</p>
         </div>
         <div class="defect-cards" id="defect-cards"></div>
@@ -239,6 +233,8 @@
   <script src="js/interactions.js"></script>
   <script src="js/defects-data.js"></script>
   <script src="js/defects-render.js"></script>
+  <script src="js/chart-data.js"></script>
+  <script src="js/chart-render.js"></script>
   <script src="js/chart-tooltip.js"></script>
   <script src="js/date-range.js"></script>
   <script src="js/auth-gate.js"></script>
