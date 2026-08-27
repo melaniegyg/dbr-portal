@@ -3,6 +3,7 @@
     "id": "tina",
     "name": "Tina",
     "company": "Athens: Acropolis and Mythology Highlights",
+    "activityTitle": "Athens: Acropolis and Mythology Highlights Small Group Tour",
     "file": "tina.csv",
     "rateFile": "tina-rate.csv"
   },
@@ -10,12 +11,14 @@
     "id": "bustravel-iceland",
     "name": "Marie",
     "company": "BusTravel Iceland",
+    "activityTitle": "Reykjavík: Golden Circle Classic Full-Day Tour",
     "file": "bustravel-iceland.csv"
   },
   {
     "id": "rome-tours",
     "name": "Luca",
     "company": "Rome Tours Co.",
+    "activityTitle": "Rome: Colosseum & Roman Forum Skip-the-Line Tour",
     "file": "rome-tours.csv"
   }
 ]

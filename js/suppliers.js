@@ -117,19 +117,28 @@
   var RECOMMENDED_MAX = 5; // % — the chart's recommended-max line
   var currentRates = null; // { 30:{rate,total,defective}, 60:{...}, 90:{...} }
   var origDbrValueHtml = null;
+  var origActivityTitle = null;
 
+  // Parse the rate CSV into { rates: {days:{...}}, activityTitle }.
   function parseRates(text) {
-    var out = {};
+    var rates = {};
+    var activityTitle = null;
     parseCSV(text).forEach(function (r) {
+      if (!activityTitle && r["activity_title"]) activityTitle = r["activity_title"];
       var days = intOrNull((r.period || "").replace(/[^0-9]/g, ""));
       if (!days) return;
-      out[days] = {
+      rates[days] = {
         rate: parseFloat(r["defect_rate_pct"]),
         total: intOrNull(r["total_bookings"]),
         defective: intOrNull(r["defective_bookings"]),
       };
     });
-    return out;
+    return { rates: rates, activityTitle: activityTitle };
+  }
+
+  function setActivityTitle(text) {
+    var el = document.querySelector(".page-title");
+    if (el && text) el.textContent = text;
   }
 
   function fmtRate(n) {
@@ -167,8 +176,10 @@
     fetch(SUPPLIER_DIR + supplier.rateFile)
       .then(function (r) { return r.text(); })
       .then(function (text) {
-        currentRates = parseRates(text);
+        var parsed = parseRates(text);
+        currentRates = parsed.rates;
         window.updateDbrRate(currentPeriodDays());
+        if (parsed.activityTitle) setActivityTitle(parsed.activityTitle);
       })
       .catch(function (err) {
         console.error("Failed to load rate CSV", err);
@@ -219,6 +230,7 @@
     if (!s) return;
     current = s;
     setUser(s);
+    setActivityTitle(s.activityTitle || origActivityTitle);
     suppliers.forEach(function (x) {
       var i = suppliers.indexOf(x);
       var item = els.menu && els.menu.children[i];
@@ -260,6 +272,8 @@
     initSwitcher();
     var dbrValue = document.querySelector(".dbr-card__value");
     if (dbrValue && origDbrValueHtml == null) origDbrValueHtml = dbrValue.innerHTML;
+    var titleEl = document.querySelector(".page-title");
+    if (titleEl && origActivityTitle == null) origActivityTitle = titleEl.textContent;
     if (typeof window.renderDefectCards !== "function") return;
 
     fetch(MANIFEST_URL)
