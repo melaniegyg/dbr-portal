@@ -53,16 +53,34 @@
     return String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
   };
 
-  // Build a lookup: normalized defect key -> { count } from a CSV.
+  var intOrNull = function (v) {
+    var n = parseInt(v, 10);
+    return isNaN(n) ? null : n;
+  };
+
+  // Which period's count the cards display. The "Key drivers" section is
+  // scoped to the past 90 days, so default to defects_90d.
+  function pickCount(r) {
+    if (r.count !== undefined && r.count !== "") return intOrNull(r.count);
+    var periods = [r.defects_90d, r.defects_60d, r.defects_30d,
+                   r.reviews, r.bookings, r.volume, r.total];
+    for (var i = 0; i < periods.length; i++) {
+      if (periods[i] !== undefined && periods[i] !== "") return intOrNull(periods[i]);
+    }
+    return null;
+  }
+
+  // Build a lookup: normalized defect key -> { count, counts } from a CSV.
+  // Accepts the canonical format (defect/defect_name/count) and the raw
+  // Databricks export (final_tagging + defects_30d/60d/90d).
   function buildFlagged(csvRows) {
     var map = {};
     csvRows.forEach(function (r) {
-      var count = parseInt(
-        r.count || r.reviews || r.bookings || r.volume || r.total || "",
-        10
-      );
-      var entry = { count: isNaN(count) ? null : count };
-      [r.defect, r["defect_name"], r["defect name"], r.name].forEach(function (k) {
+      var entry = {
+        count: pickCount(r),
+        counts: { d30: intOrNull(r.defects_30d), d60: intOrNull(r.defects_60d), d90: intOrNull(r.defects_90d) },
+      };
+      [r.defect, r.final_tagging, r["defect_name"], r["defect name"], r.name].forEach(function (k) {
         if (k) map[norm(k)] = entry;
       });
     });

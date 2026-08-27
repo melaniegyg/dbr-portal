@@ -1,5 +1,11 @@
 [
   {
+    "id": "tina",
+    "name": "Tina",
+    "company": "Athens: Acropolis and Mythology Highlights",
+    "file": "tina.csv"
+  },
+  {
     "id": "bustravel-iceland",
     "name": "Marie",
     "company": "BusTravel Iceland",

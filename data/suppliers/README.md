@@ -9,15 +9,21 @@ or `scripts/sync-databricks.py` later).
 
 One row per flagged defect. Recognised columns (case-insensitive, tolerant):
 
-| column        | required | purpose                                                        |
-| ------------- | -------- | -------------------------------------------------------------- |
-| `defect`      | yes\*    | internal defect key — matched against `DEFECT` in the CLAUDE MAP |
-| `defect_name` | yes\*    | supplier-facing defect name — used as a fallback match key      |
-| `category`    | no       | informational / disambiguation                                 |
-| `count`       | no       | volume shown on the card (e.g. "Address {count} reviews…")      |
+| column          | required | purpose                                                          |
+| --------------- | -------- | ---------------------------------------------------------------- |
+| `defect`        | yes\*    | internal defect key — matched against `DEFECT` in the CLAUDE MAP |
+| `final_tagging` | yes\*    | same as `defect` — the raw Databricks export column name         |
+| `defect_name`   | yes\*    | supplier-facing defect name — used as a fallback match key       |
+| `category`      | no       | informational / disambiguation                                  |
+| `count`         | no       | volume shown in the Recommended Action title                     |
+| `defects_90d` / `defects_60d` / `defects_30d` | no | raw export counts; the cards use **90d** (the "past 90 days" section) |
 
-\* at least one of `defect` / `defect_name` must be present; matching is
-normalised (trim + lowercase). Extra columns are ignored.
+\* at least one of `defect` / `final_tagging` / `defect_name` must be present;
+matching is normalised (trim + lowercase). Extra columns are ignored.
+
+Two shapes are accepted: the canonical `category,defect,defect_name,count`, and
+the raw Databricks tagging export `final_tagging,defects_30d,defects_60d,defects_90d`
+(dropped in as-is — see `tina.csv`).
 
 ## Registering a supplier
 
