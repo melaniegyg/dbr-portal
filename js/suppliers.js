@@ -236,16 +236,21 @@
       var item = els.menu && els.menu.children[i];
       if (item) item.setAttribute("aria-selected", x.id === id ? "true" : "false");
     });
-    fetch(SUPPLIER_DIR + s.file)
-      .then(function (r) { return r.text(); })
-      .then(function (text) {
-        var flagged = buildFlagged(parseCSV(text));
-        window.renderDefectCards(filterData(flagged));
-      })
-      .catch(function (err) {
-        console.error("Failed to load supplier CSV", err);
-        window.renderDefectCards([]);
-      });
+    if (s.allDefects) {
+      // "Show everything" view — every category/defect, unfiltered.
+      window.renderDefectCards(DEFECTS_DATA);
+    } else {
+      fetch(SUPPLIER_DIR + s.file)
+        .then(function (r) { return r.text(); })
+        .then(function (text) {
+          var flagged = buildFlagged(parseCSV(text));
+          window.renderDefectCards(filterData(flagged));
+        })
+        .catch(function (err) {
+          console.error("Failed to load supplier CSV", err);
+          window.renderDefectCards([]);
+        });
+    }
 
     applyRate(s); // update the disrupted-booking-rate stat card
   }

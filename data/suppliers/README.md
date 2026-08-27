@@ -35,3 +35,11 @@ Add the CSV here and one entry to `suppliers.json`:
 
 `id` must be unique; `name` + `company` show in the top-nav switcher; `file` is
 the CSV filename in this folder.
+
+Optional manifest fields:
+
+- `activityTitle` — sets the page header when this supplier is selected
+  (a rate file's `activity_title` overrides it).
+- `rateFile` — a rate CSV (see below) driving the "Disrupted booking rate" stat.
+- `allDefects: true` — a "show everything" view: renders every category/defect
+  with no `file` needed (used for the default overview supplier).
