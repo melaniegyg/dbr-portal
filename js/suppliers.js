@@ -167,9 +167,8 @@
       currentRates[Object.keys(currentRates)[0]];
     if (!r || isNaN(r.rate)) { if (origDbrValueHtml != null) valueEl.innerHTML = origDbrValueHtml; return; }
     var atRisk = r.rate >= RECOMMENDED_MAX;
-    valueEl.innerHTML = fmtRate(r.rate) + "% " +
-      '<span class="dbr-tag ' + (atRisk ? "dbr-tag--risk" : "dbr-tag--good") + '">' +
-      (atRisk ? "At risk" : "On track") + "</span>";
+    valueEl.innerHTML = fmtRate(r.rate) + "%" +
+      (atRisk ? ' <span class="dbr-tag dbr-tag--risk">At risk</span>' : "");
   };
 
   function currentPeriodDays() {
