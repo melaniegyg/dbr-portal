@@ -87,7 +87,11 @@
     return map;
   }
 
-  // Filter DEFECTS_DATA to flagged categories/defects, annotating counts.
+  // How many categories a CSV-backed supplier shows (top N by volume).
+  var TOP_CATEGORIES = 3;
+
+  // Filter DEFECTS_DATA to flagged categories/defects, annotating counts,
+  // then keep only the top categories by total defect volume.
   function filterData(flagged) {
     var out = [];
     DEFECTS_DATA.forEach(function (cat) {
@@ -105,10 +109,15 @@
         var catCopy = {};
         for (var k in cat) catCopy[k] = cat[k];
         catCopy.defects = defects;
+        catCopy._total = defects.reduce(function (s, d) { return s + (d.count || 0); }, 0);
         out.push(catCopy);
       }
     });
-    return out;
+    // Rank by total volume, keep the top N, drop the rest.
+    out.sort(function (a, b) { return b._total - a._total; });
+    var top = out.slice(0, TOP_CATEGORIES);
+    top.forEach(function (c) { delete c._total; });
+    return top;
   }
 
   // --- disrupted-booking-rate stat ---------------------------
