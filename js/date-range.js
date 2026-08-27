@@ -25,10 +25,9 @@
   }
 
   const OPTIONS = [
-    { label: "Last 7 days", days: 7 },
     { label: "Last 30 days", days: 30 },
+    { label: "Last 60 days", days: 60 },
     { label: "Last 90 days", days: 90 },
-    { label: "Last 12 months", days: 365 },
   ];
 
   control.classList.add("select-input--interactive");
@@ -64,6 +63,7 @@
       menu.querySelectorAll(".select-menu__item").forEach((x) => x.classList.remove("is-active"));
       li.classList.add("is-active");
       if (window.DBR_CHART) window.DBR_CHART.render(o.days);
+      if (window.updateDbrRate) window.updateDbrRate(o.days);
       close();
     });
     menu.appendChild(li);
@@ -76,6 +76,15 @@
   });
 
   // Initialize the range label from the default selection.
-  const def = OPTIONS.find((o) => o.label === labelEl.textContent) || OPTIONS[1];
+  const def = OPTIONS.find((o) => o.label === labelEl.textContent) || OPTIONS[0];
   rangeEl.textContent = rangeText(def.days);
+  if (window.updateDbrRate) window.updateDbrRate(def.days);
+
+  // Expose the currently-selected period so other modules (supplier
+  // switcher) can refresh the rate for the active window on load.
+  window.getDbrPeriodDays = function () {
+    const active = menu.querySelector(".select-menu__item.is-active");
+    const found = active && OPTIONS.find((o) => o.label === active.textContent.trim());
+    return (found || def).days;
+  };
 })();

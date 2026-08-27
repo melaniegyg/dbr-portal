@@ -889,6 +889,7 @@ text.chart-axis {
   border-radius: var(--radius-pill);
 }
 .dbr-tag--risk { background: var(--gyg-surface-warning-weak); color: #92400e; }
+.dbr-tag--good { background: var(--gyg-tag-success-bg); color: var(--gyg-tag-success-text); }
 
 /* Chart hover tooltip */
 .chart-tt {

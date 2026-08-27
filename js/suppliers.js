@@ -111,6 +111,72 @@
     return out;
   }
 
+  // --- disrupted-booking-rate stat ---------------------------
+  // Driven by an optional per-supplier rate CSV
+  // (tour_id,activity_title,period,total_bookings,defective_bookings,defect_rate_pct).
+  var RECOMMENDED_MAX = 5; // % — the chart's recommended-max line
+  var currentRates = null; // { 30:{rate,total,defective}, 60:{...}, 90:{...} }
+  var origDbrValueHtml = null;
+
+  function parseRates(text) {
+    var out = {};
+    parseCSV(text).forEach(function (r) {
+      var days = intOrNull((r.period || "").replace(/[^0-9]/g, ""));
+      if (!days) return;
+      out[days] = {
+        rate: parseFloat(r["defect_rate_pct"]),
+        total: intOrNull(r["total_bookings"]),
+        defective: intOrNull(r["defective_bookings"]),
+      };
+    });
+    return out;
+  }
+
+  function fmtRate(n) {
+    return (Math.round(n * 100) / 100).toString();
+  }
+
+  // Update the "Disrupted booking rate" value + tag for a period (days).
+  window.updateDbrRate = function (days) {
+    var valueEl = document.querySelector(".dbr-card__value");
+    if (!valueEl) return;
+    if (!currentRates) {
+      if (origDbrValueHtml != null) valueEl.innerHTML = origDbrValueHtml;
+      return;
+    }
+    var r = currentRates[days] ||
+      currentRates[90] || currentRates[60] || currentRates[30] ||
+      currentRates[Object.keys(currentRates)[0]];
+    if (!r || isNaN(r.rate)) { if (origDbrValueHtml != null) valueEl.innerHTML = origDbrValueHtml; return; }
+    var atRisk = r.rate >= RECOMMENDED_MAX;
+    valueEl.innerHTML = fmtRate(r.rate) + "% " +
+      '<span class="dbr-tag ' + (atRisk ? "dbr-tag--risk" : "dbr-tag--good") + '">' +
+      (atRisk ? "At risk" : "On track") + "</span>";
+  };
+
+  function currentPeriodDays() {
+    return (typeof window.getDbrPeriodDays === "function") ? window.getDbrPeriodDays() : 90;
+  }
+
+  function applyRate(supplier) {
+    if (!supplier.rateFile) {
+      currentRates = null;
+      window.updateDbrRate(currentPeriodDays()); // restores original value
+      return;
+    }
+    fetch(SUPPLIER_DIR + supplier.rateFile)
+      .then(function (r) { return r.text(); })
+      .then(function (text) {
+        currentRates = parseRates(text);
+        window.updateDbrRate(currentPeriodDays());
+      })
+      .catch(function (err) {
+        console.error("Failed to load rate CSV", err);
+        currentRates = null;
+        window.updateDbrRate(currentPeriodDays());
+      });
+  }
+
   // --- switcher UI -------------------------------------------
   var els = {};
   var suppliers = [];
@@ -168,6 +234,8 @@
         console.error("Failed to load supplier CSV", err);
         window.renderDefectCards([]);
       });
+
+    applyRate(s); // update the disrupted-booking-rate stat card
   }
 
   function initSwitcher() {
@@ -190,6 +258,8 @@
   // --- boot ---------------------------------------------------
   function boot() {
     initSwitcher();
+    var dbrValue = document.querySelector(".dbr-card__value");
+    if (dbrValue && origDbrValueHtml == null) origDbrValueHtml = dbrValue.innerHTML;
     if (typeof window.renderDefectCards !== "function") return;
 
     fetch(MANIFEST_URL)
