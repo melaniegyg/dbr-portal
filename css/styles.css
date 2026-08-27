@@ -617,6 +617,15 @@ text.chart-axis {
    ============================================================ */
 
 .defect-cards { display: flex; flex-direction: column; gap: 12px; }
+.defect-cards__empty {
+  background: white;
+  border: 1px solid var(--gyg-border-non-interactive);
+  border-radius: 12px;
+  padding: 32px 24px;
+  font: var(--font-body);
+  color: var(--gyg-label-secondary);
+  text-align: center;
+}
 
 .category-card {
   background: white;
@@ -625,47 +634,93 @@ text.chart-axis {
   overflow: hidden;
 }
 
-/* Header (collapse toggle) */
-.category-card__header {
-  width: 100%;
+/* Body layout: [ left: title + defect rail ] | [ right: chevron + content ] */
+.category-card__body {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 32px;
+  padding: 24px;
+}
+
+/* LEFT column */
+.cc-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-right: 1px solid var(--gyg-separator-primary);
+  padding-right: 28px;
+}
+.cc-left__head {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 20px 24px;
-  background: white;
+  background: none;
   border: none;
   text-align: left;
+  padding: 0;
+  cursor: pointer;
   color: var(--gyg-label-primary);
 }
-.category-card__icon { display: inline-flex; color: var(--gyg-label-primary); }
-.category-card__title { font: var(--font-title-3); color: var(--gyg-label-primary); }
-.category-card__chevron {
-  margin-left: auto;
-  color: var(--gyg-label-primary);
-  transition: transform 0.2s ease;
+.cc-icon { display: inline-flex; color: var(--gyg-label-primary); flex-shrink: 0; }
+.cc-title { font: var(--font-title-3); color: var(--gyg-label-primary); }
+
+/* Defect selector rail */
+.defect-nav { display: flex; flex-direction: column; gap: 4px; }
+.defect-nav-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: background 0.15s ease;
 }
+.defect-nav-item:hover { background: var(--gyg-background-secondary); }
+.defect-nav-item.is-active { background: #e1f0ff; }
+.defect-nav-item__title { font: var(--font-body-strong); color: var(--gyg-label-primary); }
+.defect-nav-item.is-active .defect-nav-item__title { color: var(--gyg-interactive-primary); }
+.defect-nav-item__desc { font: var(--font-caption); color: var(--gyg-label-secondary); }
+
+/* RIGHT column */
+.cc-right { position: relative; min-width: 0; }
+.cc-collapse {
+  position: absolute;
+  top: 0; right: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--gyg-label-primary);
+  padding: 0;
+  display: inline-flex;
+}
+.category-card__chevron { transition: transform 0.2s ease; }
 .category-card.is-collapsed .category-card__chevron { transform: rotate(180deg); }
-.category-card.is-collapsed .category-card__body { display: none; }
+.cc-content { display: flex; flex-direction: column; gap: 24px; padding-right: 40px; }
 
-/* Body layout: defect list | what you can do | faq */
-.category-card__body {
-  display: grid;
-  grid-template-columns: minmax(240px, 300px) 1fr;
-  gap: 32px;
-  padding: 4px 24px 28px;
-  border-top: 1px solid var(--gyg-separator-primary);
-  padding-top: 20px;
-}
+/* Collapsed: keep only the title (left) and chevron (right) on one row */
+.category-card.is-collapsed .defect-nav,
+.category-card.is-collapsed .cc-content { display: none; }
+.category-card.is-collapsed .cc-left { border-right: none; padding-right: 0; gap: 0; }
 
-/* Right panel: optional recommended-action block + [ what you can do | faq ] */
-.dp-right { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
-.dp-cols {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 372px);
-  gap: 48px;
-}
+/* Content row: "What you can do" + optional "FAQ resources" */
+.dp-top { display: flex; gap: 48px; align-items: flex-start; }
+.dp-advice { flex: 1 1 auto; min-width: 0; }
+.dp-faq { flex: 0 0 300px; }
+.dp-heading { font: var(--font-title-4); color: var(--gyg-label-primary); margin: 0 0 16px; }
 
-/* Recommended actions */
+.wycd-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
+.wycd-list li { font: var(--font-body); color: var(--gyg-label-primary); }
+.dp-empty { font: var(--font-body); color: var(--gyg-label-secondary); margin: 0; }
+
+.faq-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
+.faq-list a { font: var(--font-body-strong); color: var(--gyg-interactive-primary); }
+.faq-list a svg { display: inline-block; vertical-align: -0.25em; margin-left: 4px; }
+
+/* Recommended-action card (bottom) */
 .dp-ra { display: flex; flex-direction: column; gap: 12px; }
 .dp-ra-card {
   border: 1px solid var(--gyg-border-non-interactive);
@@ -682,61 +737,53 @@ text.chart-axis {
 .dp-ra-card__desc { font: var(--font-caption); color: var(--gyg-label-secondary); margin: 4px 0 0; max-width: 620px; }
 .dp-ra-card__btn { flex-shrink: 0; width: auto; }
 
-/* Left rail: defect selector */
-.defect-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  border-right: 1px solid var(--gyg-separator-primary);
-  padding-right: 28px;
-}
-.defect-nav-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-  text-align: left;
-  padding: 12px 14px;
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-lg);
-  transition: background 0.15s ease;
-}
-.defect-nav-item:hover { background: var(--gyg-background-secondary); }
-.defect-nav-item.is-active { background: #e1f0ff; }
-.defect-nav-item__title { font: var(--font-body-strong); color: var(--gyg-label-primary); }
-.defect-nav-item.is-active .defect-nav-item__title { color: var(--gyg-interactive-primary); }
-.defect-nav-item__desc { font: var(--font-caption); color: var(--gyg-label-secondary); }
-
-/* Middle + right panels */
-.category-panel__heading { font: var(--font-title-4); color: var(--gyg-label-primary); margin: 0 0 16px; }
-.category-panel__empty { font: var(--font-body); color: var(--gyg-label-secondary); margin: 0; }
-
-.wycd-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; }
-.wycd-list li { font: var(--font-body); color: var(--gyg-label-primary); }
-
-.see-reviews-btn {
-  margin-top: 24px;
+/* Bottom CTA button row (only when no RA card) */
+.dp-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn-secondary {
   background: white;
   color: var(--gyg-interactive-primary);
-  border: 1px solid var(--gyg-interactive-primary);
+  border: 2px solid var(--gyg-interactive-primary);
   border-radius: var(--radius-pill);
-  padding: 11px 22px;
+  padding: 8px 22px;
   font: var(--font-body-strong);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
 }
-.see-reviews-btn:hover { background: #e1f0ff; }
+.btn-secondary:hover { background: #e1f0ff; }
+.dp-actions .btn-primary { width: auto; }
 
-.faq-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
-.faq-list a {
-  font: var(--font-body-strong);
-  color: var(--gyg-interactive-primary);
+/* Supplier switcher menu (top-nav user element) */
+.topnav__user { position: relative; cursor: pointer; user-select: none; }
+.topnav__user.is-open .topnav__chevron { transform: rotate(180deg); }
+.topnav__chevron { transition: transform 0.2s ease; }
+.supplier-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: white;
+  border: 1px solid var(--gyg-border-non-interactive);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  z-index: 300;
 }
-/* External-link icon trails the label inline (stays with the last word) */
-.faq-list a svg {
-  display: inline-block;
-  vertical-align: -0.2em;
-  margin-left: 4px;
+.supplier-menu[hidden] { display: none; }
+.supplier-menu__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
 }
+.supplier-menu__item:hover { background: var(--gyg-background-secondary); }
+.supplier-menu__item[aria-selected="true"] { background: #e1f0ff; }
+.supplier-menu__name { font: var(--font-caption-strong); color: var(--gyg-label-primary); }
+.supplier-menu__company { font: var(--font-label); color: var(--gyg-label-secondary); }
 
 /* ============================================================
    DISRUPTED BOOKINGS  (matches Performance Hub – Q3-26 Figma)

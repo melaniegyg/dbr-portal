@@ -1,0 +1,17 @@
+[
+  {
+    "id": "bustravel-iceland",
+    "name": "Marie",
+    "company": "BusTravel Iceland",
+    "activityTitle": "Reykjavík: Golden Circle Classic Full-Day Tour",
+    "allDefects": true
+  },
+  {
+    "id": "tina",
+    "name": "Tina",
+    "company": "Athens: Acropolis and Mythology Highlights",
+    "activityTitle": "Athens: Acropolis and Mythology Highlights Small Group Tour",
+    "file": "tina.csv",
+    "rateFile": "tina-rate.csv"
+  }
+]
