@@ -71,13 +71,29 @@
     return [...new Set(fractions.map((f) => Math.round(f * (n - 1))))];
   }
 
+  // When a breach is not allowed, the line's peak is scaled to this value
+  // so it stays just under the 5% recommended-max line.
+  const CAP_PCT = 4.8;
+
   function render(days) {
     const ds = window.DBR_DATASETS[days];
     if (!ds) return;
     const n = ds.values.length;
     const step = (X1 - X0) / (n - 1);
 
-    const points = ds.values.map((v, i) => {
+    // New logic: the line may only rise above the 5% max when a breach is
+    // allowed (set from the supplier's 30/60/90 numbers). Otherwise scale
+    // the whole series down so its peak stays just below the max line.
+    let values = ds.values;
+    if (window.DBR_ALLOW_BREACH === false) {
+      const peak = Math.max.apply(null, values);
+      if (peak > CAP_PCT) {
+        const f = CAP_PCT / peak;
+        values = values.map((v) => round1(v * f));
+      }
+    }
+
+    const points = values.map((v, i) => {
       const date = pointDate(ds.unit, n - 1 - i);
       return {
         x: round1(X0 + i * step),

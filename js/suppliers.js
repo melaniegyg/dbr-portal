@@ -124,6 +124,9 @@
   // Driven by an optional per-supplier rate CSV
   // (tour_id,activity_title,period,total_bookings,defective_bookings,defect_rate_pct).
   var RECOMMENDED_MAX = 5; // % — the chart's recommended-max line
+  // The chart line may only breach the 5% max when one of the supplier's
+  // 30/60/90 rate numbers is above this threshold.
+  var BREACH_RATE_THRESHOLD = 50; // %
   var currentRates = null; // { 30:{rate,total,defective}, 60:{...}, 90:{...} }
   var origDbrValueHtml = null;
   var origActivityTitle = null;
@@ -175,10 +178,24 @@
     return (typeof window.getDbrPeriodDays === "function") ? window.getDbrPeriodDays() : 90;
   }
 
+  // Decide whether the chart line may breach 5% (only if a 30/60/90 rate
+  // number is above the threshold), then re-render the chart.
+  function applyBreach() {
+    var allow = true; // default (e.g. no rate data): keep the chart as-is
+    if (currentRates) {
+      allow = Object.keys(currentRates).some(function (k) {
+        return currentRates[k].rate > BREACH_RATE_THRESHOLD;
+      });
+    }
+    window.DBR_ALLOW_BREACH = allow;
+    if (window.DBR_CHART) window.DBR_CHART.render(currentPeriodDays());
+  }
+
   function applyRate(supplier) {
     if (!supplier.rateFile) {
       currentRates = null;
       window.updateDbrRate(currentPeriodDays()); // restores original value
+      applyBreach();
       return;
     }
     fetch(SUPPLIER_DIR + supplier.rateFile)
@@ -188,11 +205,13 @@
         currentRates = parsed.rates;
         window.updateDbrRate(currentPeriodDays());
         if (parsed.activityTitle) setActivityTitle(parsed.activityTitle);
+        applyBreach();
       })
       .catch(function (err) {
         console.error("Failed to load rate CSV", err);
         currentRates = null;
         window.updateDbrRate(currentPeriodDays());
+        applyBreach();
       });
   }
 
