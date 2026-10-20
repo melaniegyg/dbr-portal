@@ -794,7 +794,8 @@ text.chart-axis {
   display: flex;
   gap: 32px;
   border-bottom: 2px solid #dcdfe4;
-  margin: 16px 0 4px;
+  /* Pull up to offset the .page-inner flex gap so the tabs sit closer to the title */
+  margin: -24px 0 4px;
 }
 .perf-tab {
   background: none;
